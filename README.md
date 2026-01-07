@@ -3,7 +3,7 @@
 Decentralized funding for climate action projects on Cardano blockchain.
 
 ## 🌐 Live Demo
-[https://YOUR_USERNAME.github.io/climate-dao-treasury/](https://YOUR_USERNAME.github.io/climate-dao-treasury/)
+[https://Kamara23-tics.github.io/climate-dao-treasury/](https://Kamara23-tics.github.io/climate-dao-treasury/)
 
 ## ✨ Features
 - Create funding proposals for climate projects
