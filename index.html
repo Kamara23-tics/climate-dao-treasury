@@ -90,14 +90,14 @@
                                 <span id="currentTime">Loading...</span>
                             </div>
                             <div class="deadline-buttons">
-                                <button id="setDeadline2Min" class="btn btn-small btn-outline">
-                                    2 Minutes
-                                </button>
                                 <button id="setDeadline5Min" class="btn btn-small btn-outline">
                                     5 Minutes
                                 </button>
-                                <button id="setDeadline1Hour" class="btn btn-small btn-outline">
-                                    1 Hour
+                                <button id="setDeadline1Month" class="btn btn-small btn-outline">
+                                    1 Month
+                                </button>
+                                <button id="setDeadline2Months" class="btn btn-small btn-outline">
+                                    2 Months
                                 </button>
                             </div>
                         </div>
@@ -277,20 +277,20 @@
         updateTimeDisplays();
 
         // Deadline setters
-        document.getElementById('setDeadline2Min').addEventListener('click', () => {
-            const time = Date.now() + (2 * 60 * 1000);
-            document.getElementById('votingDeadline').value = time;
-            log(`✓ Deadline: ${new Date(time).toLocaleString()}`);
-        });
-
         document.getElementById('setDeadline5Min').addEventListener('click', () => {
             const time = Date.now() + (5 * 60 * 1000);
             document.getElementById('votingDeadline').value = time;
             log(`✓ Deadline: ${new Date(time).toLocaleString()}`);
         });
 
-        document.getElementById('setDeadline1Hour').addEventListener('click', () => {
-            const time = Date.now() + (60 * 60 * 1000);
+        document.getElementById('setDeadline1Month').addEventListener('click', () => {
+            const time = Date.now() + (30 * 24 * 60 * 1000);
+            document.getElementById('votingDeadline').value = time;
+            log(`✓ Deadline: ${new Date(time).toLocaleString()}`);
+        });
+
+        document.getElementById('setDeadline2Months').addEventListener('click', () => {
+            const time = Date.now() + (60 * 24 * 60 * 60 * 1000);
             document.getElementById('votingDeadline').value = time;
             log(`✓ Deadline: ${new Date(time).toLocaleString()}`);
         });
