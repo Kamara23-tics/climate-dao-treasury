@@ -4,7 +4,7 @@ Decentralized funding for climate action projects on Cardano blockchain.
 Climate DAO Treasury allows proposers to create funding requests for environmental projects (solar farms, reforestation, carbon capture, etc.). Funds are locked in a smart contract with automated rules enforced on-chain—no intermediaries, no manual approvals.
 
 ## 🌐 Live Demo
-[https://Kamara23-tics.github.io/climate-dao-treasury/](https://Kamara23-tics.github.io/climate-dao-treasury/)
+[(https://kamara23-tics.github.io/climate-dao-treasury-Dapp/)
 
 ## ✨ Features
 - Create funding proposals for climate projects
