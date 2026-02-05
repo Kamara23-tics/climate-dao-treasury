@@ -20,7 +20,7 @@ import qualified Plutus.V2.Ledger.Api as PlutusV2
 import Plutus.V1.Ledger.Interval as Interval (contains, from, to)
 import Plutus.V1.Ledger.Value (valueOf, adaSymbol, adaToken)
 import PlutusTx
-import PlutusTx.Prelude hiding (Semigroup(..), unless, divide)
+import PlutusTx.Prelude hiding (Semigroup(..), unless)
 import qualified PlutusTx.Builtins as Builtins
 
 -- Serialization
@@ -52,6 +52,19 @@ data TreasuryAction
 PlutusTx.unstableMakeIsData ''TreasuryAction
 
 ------------------------------------------------------------------------
+-- Configuration Constants
+------------------------------------------------------------------------
+
+-- Cancellation fee: 10% (represented as 10 out of 100)
+{-# INLINABLE cancellationFeeNumerator #-}
+cancellationFeeNumerator :: Integer
+cancellationFeeNumerator = 10
+
+{-# INLINABLE cancellationFeeDenominator #-}
+cancellationFeeDenominator :: Integer
+cancellationFeeDenominator = 100
+
+------------------------------------------------------------------------
 -- Helpers
 ------------------------------------------------------------------------
 
@@ -64,8 +77,17 @@ scriptInputContainsAda ctx requiredAmount =
             let v = txOutValue $ txInInfoResolved i
             in valueOf v adaSymbol adaToken >= requiredAmount
 
+{-# INLINABLE calculateRefundAmount #-}
+-- Calculate refund amount after deducting cancellation fee
+-- Returns (refundAmount, feeAmount)
+calculateRefundAmount :: Integer -> (Integer, Integer)
+calculateRefundAmount fundingGoal =
+    let fee = (fundingGoal * cancellationFeeNumerator) `divide` cancellationFeeDenominator
+        refund = fundingGoal - fee
+    in (refund, fee)
+
 ------------------------------------------------------------------------
--- Validator Logic - FIXED VERSION
+-- Validator Logic - WITH CANCELLATION FEE
 ------------------------------------------------------------------------
 
 {-# INLINABLE mkValidator #-}
@@ -74,7 +96,6 @@ mkValidator dat action ctx =
     case action of
       FundProposal ->
            traceIfFalse "proposer signature missing" (txSignedBy info (pdProposer dat)) &&
-           -- ✅ FIX: Changed to use `from` instead of `from (deadline + 1)`
            traceIfFalse "voting period not over"   afterDeadline &&
            traceIfFalse "insufficient funds in script" (scriptInputContainsAda ctx (pdFundingGoal dat)) &&
            traceIfFalse "recipient not paid" recipientPaid
@@ -82,7 +103,8 @@ mkValidator dat action ctx =
       CancelProposal ->
            traceIfFalse "proposer signature missing" (txSignedBy info (pdProposer dat)) &&
            traceIfFalse "cancellation period elapsed" beforeDeadline &&
-           traceIfFalse "funds not returned to proposer" proposerRefunded
+           -- NEW: Check that proposer receives only (fundingGoal - fee)
+           traceIfFalse "proposer refund incorrect (fee not deducted)" proposerRefundedWithFee
   where
     info :: TxInfo
     info = scriptContextTxInfo ctx
@@ -90,12 +112,9 @@ mkValidator dat action ctx =
     txRange :: POSIXTimeRange
     txRange = txInfoValidRange info
 
-    -- ✅ KEY FIX: Check that txRange starts AFTER the deadline
-    -- This means the transaction's validFrom must be > deadline
     afterDeadline :: Bool
     afterDeadline = Interval.contains (Interval.from (pdVotingDeadline dat)) txRange
 
-    -- Cancellation allowed only BEFORE deadline
     beforeDeadline :: Bool
     beforeDeadline = Interval.contains (Interval.to (pdVotingDeadline dat)) txRange
 
@@ -104,10 +123,18 @@ mkValidator dat action ctx =
       let v = valuePaidTo info (pdRecipient dat)
       in valueOf v adaSymbol adaToken >= pdFundingGoal dat
 
-    proposerRefunded :: Bool
-    proposerRefunded =
+    -- OLD: Full refund (commented out)
+    -- proposerRefunded :: Bool
+    -- proposerRefunded =
+    --   let v = valuePaidTo info (pdProposer dat)
+    --   in valueOf v adaSymbol adaToken >= pdFundingGoal dat
+
+    -- NEW: Refund with fee deduction
+    proposerRefundedWithFee :: Bool
+    proposerRefundedWithFee =
       let v = valuePaidTo info (pdProposer dat)
-      in valueOf v adaSymbol adaToken >= pdFundingGoal dat
+          (refundAmount, _fee) = calculateRefundAmount (pdFundingGoal dat)
+      in valueOf v adaSymbol adaToken >= refundAmount
 
 ------------------------------------------------------------------------
 -- Boilerplate
@@ -179,9 +206,10 @@ main = do
         onchain = plutusScriptAddress
         bech32  = toBech32ScriptAddress network validator
 
-    putStrLn "\n--- Climate DAO Treasury Validator Info ---"
+    putStrLn "\n--- Climate DAO Treasury Validator Info (WITH CANCELLATION FEE) ---"
+    putStrLn $ "Cancellation Fee: " <> P.show cancellationFeeNumerator <> "%"
     putStrLn $ "Validator Hash (Plutus): " <> P.show vh
     putStrLn $ "Plutus Script Address:    " <> P.show onchain
     putStrLn $ "Bech32 Script Address:    " <> bech32
-    putStrLn "-----------------------------------------"
-    putStrLn "Climate DAO Treasury validator generated successfully."
+    putStrLn "--------------------------------------------------------------------"
+    putStrLn "Climate DAO Treasury validator with cancellation fee generated successfully."
