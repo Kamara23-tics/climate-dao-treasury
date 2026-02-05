@@ -1,6 +1,7 @@
 /* ===============================
    CLIMATE DAO TREASURY STYLES
    Beautiful green & blue theme
+   WITH CANCELLATION FEE UI
    =============================== */
 
 /* Reset */
@@ -50,6 +51,38 @@ body {
     font-size: 1.125rem;
     color: rgba(255, 255, 255, 0.95);
     font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+/* Header Badge - NEW */
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin-top: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.badge-icon {
+    font-size: 1.125rem;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 /* Wallet Section */
@@ -85,6 +118,133 @@ body {
     padding: 0.75rem;
     border-radius: 0.5rem;
     border: 2px solid #bbf7d0;
+}
+
+/* Fee Calculator - NEW */
+.fee-calculator {
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    animation: slideDown 0.3s ease;
+}
+
+.fee-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.9375rem;
+}
+
+.fee-row + .fee-row {
+    border-top: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.fee-label {
+    color: #78350f;
+    font-weight: 600;
+}
+
+.fee-value {
+    color: #92400e;
+    font-weight: 700;
+    font-size: 1.0625rem;
+}
+
+.fee-highlight {
+    background: rgba(255, 255, 255, 0.5);
+    margin: 0 -0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.fee-highlight .fee-value {
+    color: #059669;
+    font-size: 1.25rem;
+}
+
+.fee-deduction {
+    background: rgba(239, 68, 68, 0.1);
+    margin: 0 -0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.fee-deduction .fee-value {
+    color: #dc2626;
+    font-size: 1.125rem;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fee Example Box - NEW */
+.fee-example-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 2px solid #93c5fd;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.fee-example-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fee-example-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.fee-example-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+}
+
+.fee-example-amount {
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.fee-example-refund {
+    background: #d1fae5;
+    border: 2px solid #10b981;
+}
+
+.fee-example-refund .fee-example-amount {
+    color: #059669;
+    font-size: 1.375rem;
+}
+
+.fee-example-fee {
+    background: #fee2e2;
+    border: 2px solid #ef4444;
+}
+
+.fee-example-fee .fee-example-amount {
+    color: #dc2626;
 }
 
 /* Tabs */
@@ -172,6 +332,15 @@ body {
     margin-bottom: 2rem;
     color: #065f46;
     line-height: 1.6;
+}
+
+.description-box strong {
+    color: #047857;
+    font-weight: 700;
+}
+
+.description-box p + p {
+    margin-top: 0.5rem;
 }
 
 /* Form Elements */
@@ -354,10 +523,18 @@ body {
     font-size: 1.25rem;
 }
 
+.alert-list li strong {
+    font-weight: 700;
+}
+
 .alert-warning {
     background: #fffbeb;
     border-color: #fde68a;
     color: #92400e;
+}
+
+.alert-warning strong {
+    color: #78350f;
 }
 
 .alert-info {
@@ -366,10 +543,18 @@ body {
     color: #1e40af;
 }
 
+.alert-info strong {
+    color: #1e3a8a;
+}
+
 .alert-success {
     background: #f0fdf4;
     border-color: #bbf7d0;
     color: #065f46;
+}
+
+.alert-success strong {
+    color: #047857;
 }
 
 /* Status Grid */
@@ -592,6 +777,11 @@ body {
         font-size: 3rem;
     }
 
+    .header-badge {
+        font-size: 0.75rem;
+        padding: 0.625rem 1.25rem;
+    }
+
     .panel {
         padding: 1.5rem;
     }
@@ -618,6 +808,20 @@ body {
 
     .status-grid {
         grid-template-columns: 1fr;
+    }
+
+    .fee-calculator {
+        padding: 1rem;
+    }
+
+    .fee-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .fee-value {
+        font-size: 1.125rem;
     }
 }
 
