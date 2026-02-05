@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Climate DAO Treasury</title>
+    <title>Climate DAO Treasury - With Cancellation Fee</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,6 +13,10 @@
             <div class="header-icon">🌍</div>
             <h1>Climate DAO Treasury</h1>
             <p class="subtitle">Fund environmental projects on Cardano blockchain</p>
+            <div class="header-badge">
+                <span class="badge-icon">⚠️</span>
+                10% Cancellation Fee Policy
+            </div>
         </header>
 
         <!-- Connect Wallet -->
@@ -69,6 +73,22 @@
                             step="0.01"
                         />
                         <small class="help-text">Minimum 1 ADA required for the project</small>
+                        
+                        <!-- Fee Calculator Display -->
+                        <div id="feeCalculator" class="fee-calculator hidden">
+                            <div class="fee-row">
+                                <span class="fee-label">Funding Amount:</span>
+                                <span id="feeAmount" class="fee-value">10 ADA</span>
+                            </div>
+                            <div class="fee-row fee-highlight">
+                                <span class="fee-label">If Cancelled (10% fee):</span>
+                                <span id="feeRefund" class="fee-value">9 ADA</span>
+                            </div>
+                            <div class="fee-row fee-deduction">
+                                <span class="fee-label">Cancellation Fee:</span>
+                                <span id="feeCost" class="fee-value">1 ADA</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Voting Deadline -->
@@ -129,14 +149,16 @@
                         <div id="addressValidation" class="validation-message"></div>
                     </div>
 
-                    <!-- Warning Box -->
+                    <!-- Warning Box - UPDATED WITH FEE INFO -->
                     <div class="alert alert-warning">
                         <div class="alert-icon">⚠️</div>
                         <div class="alert-content">
-                            <div class="alert-title">Important</div>
+                            <div class="alert-title">Important - Cancellation Fee Policy</div>
                             <ul class="alert-list">
+                                <li><strong>10% cancellation fee applies</strong> if you cancel before the deadline</li>
+                                <li>You will receive only 90% of your funds back when cancelling</li>
+                                <li>After deadline: Full amount goes to recipient (no refunds)</li>
                                 <li>Verify recipient address - transactions are irreversible</li>
-                                <li>Funds will be locked until voting deadline</li>
                                 <li>Only proposer can cancel before deadline</li>
                             </ul>
                         </div>
@@ -150,7 +172,7 @@
                 </div>
             </div>
 
-            <!-- CANCEL PROPOSAL -->
+            <!-- CANCEL PROPOSAL - UPDATED WITH FEE INFO -->
             <div id="cancel" class="tab-content">
                 <div class="panel">
                     <h2 class="panel-title">
@@ -159,7 +181,27 @@
                     </h2>
 
                     <div class="description-box">
-                        <p>Cancel your proposal and get your funds back before the voting deadline expires.</p>
+                        <p><strong>⚠️ Cancellation Fee: 10%</strong></p>
+                        <p>Cancel your proposal and get 90% of your funds back before the voting deadline expires. A 10% cancellation fee will be deducted from your refund.</p>
+                    </div>
+
+                    <!-- Fee Example Box -->
+                    <div class="fee-example-box">
+                        <div class="fee-example-title">💡 Fee Example</div>
+                        <div class="fee-example-content">
+                            <div class="fee-example-row">
+                                <span>If you deposited:</span>
+                                <span class="fee-example-amount">100 ADA</span>
+                            </div>
+                            <div class="fee-example-row fee-example-refund">
+                                <span>You will receive:</span>
+                                <span class="fee-example-amount">90 ADA</span>
+                            </div>
+                            <div class="fee-example-row fee-example-fee">
+                                <span>Cancellation fee:</span>
+                                <span class="fee-example-amount">10 ADA</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Status Info -->
@@ -180,7 +222,7 @@
 
                     <button id="cancelBtn" class="btn btn-danger btn-large">
                         <span class="btn-icon">⛔</span>
-                        Cancel My Proposal
+                        Cancel My Proposal (90% Refund)
                     </button>
 
                     <div class="alert alert-info">
@@ -190,7 +232,8 @@
                             <ul class="alert-list">
                                 <li>You must be the proposer</li>
                                 <li>Deadline must not have passed</li>
-                                <li>Funds will be returned to your wallet</li>
+                                <li><strong>90% of funds</strong> will be returned to your wallet</li>
+                                <li><strong>10% fee</strong> will be deducted as cancellation penalty</li>
                             </ul>
                         </div>
                     </div>
@@ -206,7 +249,7 @@
                     </h2>
 
                     <div class="description-box">
-                        <p>Release the locked funds to the beneficiary after the voting deadline has passed.</p>
+                        <p>Release the <strong>full locked amount</strong> to the beneficiary after the voting deadline has passed. No fees apply when releasing funds to the recipient.</p>
                     </div>
 
                     <div class="alert alert-success">
@@ -214,9 +257,10 @@
                         <div class="alert-content">
                             <div class="alert-title">This Action Will:</div>
                             <ul class="alert-list">
-                                <li>Send funds to the designated beneficiary</li>
+                                <li>Send <strong>100% of funds</strong> to the designated beneficiary</li>
                                 <li>Complete the funding proposal</li>
                                 <li>Only works after voting deadline</li>
+                                <li>No cancellation fee applies (full amount transferred)</li>
                             </ul>
                         </div>
                     </div>
@@ -234,12 +278,44 @@
                     <span class="log-icon">📜</span>
                     Transaction Log
                 </h3>
-                <div id="log" class="log-output">Ready to create proposals...</div>
+                <div id="log" class="log-output">Ready to create proposals...
+⚠️ Remember: 10% cancellation fee applies if you cancel before deadline</div>
             </div>
         </div>
     </div>
 
     <script>
+        // Fee Calculator
+        function updateFeeCalculator() {
+            const fundingGoalInput = document.getElementById('fundingGoal');
+            const feeCalculator = document.getElementById('feeCalculator');
+            const feeAmount = document.getElementById('feeAmount');
+            const feeRefund = document.getElementById('feeRefund');
+            const feeCost = document.getElementById('feeCost');
+            
+            if (fundingGoalInput && feeCalculator) {
+                const amount = parseFloat(fundingGoalInput.value) || 0;
+                
+                if (amount > 0) {
+                    feeCalculator.classList.remove('hidden');
+                    const refund = amount * 0.9; // 90%
+                    const fee = amount * 0.1; // 10%
+                    
+                    feeAmount.textContent = `${amount.toFixed(2)} ADA`;
+                    feeRefund.textContent = `${refund.toFixed(2)} ADA`;
+                    feeCost.textContent = `${fee.toFixed(2)} ADA`;
+                } else {
+                    feeCalculator.classList.add('hidden');
+                }
+            }
+        }
+
+        // Add event listener for funding goal input
+        document.getElementById('fundingGoal')?.addEventListener('input', updateFeeCalculator);
+        
+        // Initialize fee calculator
+        setTimeout(updateFeeCalculator, 100);
+
         // Time updates
         function updateTimeDisplays() {
             const now = new Date();
@@ -284,7 +360,7 @@
         });
 
         document.getElementById('setDeadline1Month').addEventListener('click', () => {
-            const time = Date.now() + (30 * 24 * 60 * 1000);
+            const time = Date.now() + (30 * 24 * 60 * 60 * 1000);
             document.getElementById('votingDeadline').value = time;
             log(`✓ Deadline: ${new Date(time).toLocaleString()}`);
         });
@@ -337,6 +413,6 @@
         }
     </script>
 
-    <script type="module" src="dao.js"></script>
+    <script type="module" src="Climate-dao-treasury.js"></script>
 </body>
 </html>
